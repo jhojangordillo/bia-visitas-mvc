@@ -1,5 +1,14 @@
 node_modules/
+node_modules_old_*/
 data/*.db
+coverage/*.css
+coverage/*.html
+coverage/*.png
+coverage/sort*.js
+coverage/prettify.js
+coverage/block-navigation.js
+coverage/sorter.js
+coverage/src/
 *.log
 .DS_Store
 .env
