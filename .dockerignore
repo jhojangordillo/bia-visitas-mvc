@@ -1,0 +1,14 @@
+node_modules
+node_modules_old_*
+coverage
+tests
+data/*.db
+docs/*.pdf
+docs/*.gv
+*.log
+.git
+.gitignore
+.dockerignore
+README.md
+Dockerfile
+docker-compose.yml

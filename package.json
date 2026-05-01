@@ -1,0 +1,44 @@
+{
+  "name": "bia-visitas-mvc",
+  "version": "1.0.0",
+  "description": "Microservicio MVC + CRUD para gestión de clientes y visitas técnicas — Retos 1 y 2 AI Native Bia",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node --experimental-sqlite src/server.js",
+    "dev": "node --watch --experimental-sqlite src/server.js",
+    "test": "node --experimental-vm-modules --experimental-sqlite node_modules/jest/bin/jest.js --runInBand",
+    "test:coverage": "node --experimental-vm-modules --experimental-sqlite node_modules/jest/bin/jest.js --runInBand --coverage"
+  },
+  "dependencies": {
+    "express": "^4.21.1"
+  },
+  "devDependencies": {
+    "jest": "^29.7.0",
+    "supertest": "^7.0.0"
+  },
+  "jest": {
+    "testEnvironment": "node",
+    "testMatch": [
+      "<rootDir>/tests/**/*.test.js"
+    ],
+    "setupFiles": [
+      "<rootDir>/tests/setup.js"
+    ],
+    "collectCoverageFrom": [
+      "src/**/*.js",
+      "!src/server.js"
+    ],
+    "coverageDirectory": "coverage",
+    "coverageReporters": [
+      "text",
+      "text-summary",
+      "html",
+      "json-summary"
+    ]
+  },
+  "engines": {
+    "node": ">=22.5"
+  },
+  "author": "Jhojan Gordillo",
+  "license": "ISC"
+}

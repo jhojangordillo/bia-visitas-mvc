@@ -1,0 +1,31 @@
+# Bia Visitas API — orquestación local
+# Levanta la API + un volumen persistente para SQLite
+#
+#   docker compose up --build
+#   docker compose down
+#   docker compose logs -f
+
+services:
+  api:
+    build: .
+    image: bia-visitas-api:1.0.0
+    container_name: bia-visitas-api
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      NODE_ENV: production
+      PORT: 3000
+      DB_PATH: /app/data/visitas.db
+    volumes:
+      - bia-visitas-data:/app/data
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:3000/health"]
+      interval: 30s
+      timeout: 3s
+      retries: 3
+      start_period: 10s
+
+volumes:
+  bia-visitas-data:
+    name: bia-visitas-data

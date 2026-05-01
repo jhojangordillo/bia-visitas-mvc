@@ -1,0 +1,41 @@
+
+> bia-visitas-mvc@1.0.0 test:coverage
+> node --experimental-vm-modules --experimental-sqlite node_modules/jest/bin/jest.js --runInBand --coverage
+
+(node:1217) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+PASS tests/clienteRoutes.test.js
+PASS tests/visitaRoutes.test.js
+PASS tests/clienteModel.test.js
+PASS tests/visitaModel.test.js
+-----------------------|---------|----------|---------|---------|---------------------
+File                   | % Stmts | % Branch | % Funcs | % Lines | Uncovered Line #s   
+-----------------------|---------|----------|---------|---------|---------------------
+All files              |   82.65 |    81.73 |   90.32 |   85.39 |                     
+ src                   |   88.88 |      100 |      80 |   88.88 |                     
+  app.js               |   88.88 |      100 |      80 |   88.88 | 48-49               
+ src/config            |      40 |    23.07 |   66.66 |   41.17 |                     
+  database.js          |      40 |    23.07 |   66.66 |   41.17 | 52-86,92-93,106-110 
+ src/controllers       |   89.36 |    88.88 |   91.66 |   94.93 |                     
+  clienteController.js |   93.18 |    90.69 |     100 |   97.22 | 57                  
+  visitaController.js  |      86 |    87.23 |   83.33 |   93.02 | 50-52               
+ src/models            |   96.96 |    91.66 |     100 |     100 |                     
+  clienteModel.js      |     100 |      100 |     100 |     100 |                     
+  visitaModel.js       |   94.11 |    83.33 |     100 |     100 | 56                  
+ src/routes            |     100 |      100 |     100 |     100 |                     
+  clienteRoutes.js     |     100 |      100 |     100 |     100 |                     
+  visitaRoutes.js      |     100 |      100 |     100 |     100 |                     
+-----------------------|---------|----------|---------|---------|---------------------
+
+=============================== Coverage summary ===============================
+Statements   : 82.65% ( 162/196 )
+Branches     : 81.73% ( 94/115 )
+Functions    : 90.32% ( 28/31 )
+Lines        : 85.39% ( 152/178 )
+================================================================================
+
+Test Suites: 4 passed, 4 total
+Tests:       45 passed, 45 total
+Snapshots:   0 total
+Time:        2.272 s, estimated 4 s
+Ran all test suites.

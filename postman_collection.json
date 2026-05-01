@@ -1,0 +1,143 @@
+{
+  "info": {
+    "name": "Bia Visitas API",
+    "description": "Microservicio MVC + CRUD para clientes y visitas técnicas — Reto 2 AI Native Bia",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_postman_id": "b1a-visitas-api-001"
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:3000", "type": "string" }
+  ],
+  "item": [
+    {
+      "name": "Sistema",
+      "item": [
+        {
+          "name": "GET / — Manifiesto",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/", "host": ["{{baseUrl}}"], "path": [""] }
+          }
+        },
+        {
+          "name": "GET /health — Healthcheck",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/health", "host": ["{{baseUrl}}"], "path": ["health"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Clientes",
+      "item": [
+        {
+          "name": "GET /api/clientes — Listar",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/api/clientes", "host": ["{{baseUrl}}"], "path": ["api", "clientes"] }
+          }
+        },
+        {
+          "name": "GET /api/clientes/:id — Uno",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/api/clientes/1", "host": ["{{baseUrl}}"], "path": ["api", "clientes", "1"] }
+          }
+        },
+        {
+          "name": "POST /api/clientes — Crear",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{baseUrl}}/api/clientes", "host": ["{{baseUrl}}"], "path": ["api", "clientes"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Hospital San Vicente\",\n  \"documento\": \"890999111\",\n  \"sector\": \"Oficial\",\n  \"ciudad\": \"Medellín\",\n  \"direccion\": \"Cl 64 # 51D-154\",\n  \"telefono\": \"6044441111\"\n}"
+            }
+          }
+        },
+        {
+          "name": "PUT /api/clientes/:id — Actualizar",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{baseUrl}}/api/clientes/1", "host": ["{{baseUrl}}"], "path": ["api", "clientes", "1"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"telefono\": \"3005556677\"\n}"
+            }
+          }
+        },
+        {
+          "name": "DELETE /api/clientes/:id — Eliminar (CASCADE)",
+          "request": {
+            "method": "DELETE",
+            "url": { "raw": "{{baseUrl}}/api/clientes/4", "host": ["{{baseUrl}}"], "path": ["api", "clientes", "4"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Visitas",
+      "item": [
+        {
+          "name": "GET /api/visitas — Listar todas",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/api/visitas", "host": ["{{baseUrl}}"], "path": ["api", "visitas"] }
+          }
+        },
+        {
+          "name": "GET /api/visitas?cliente_id=1 — Por cliente",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/visitas?cliente_id=1",
+              "host": ["{{baseUrl}}"], "path": ["api", "visitas"],
+              "query": [{ "key": "cliente_id", "value": "1" }]
+            }
+          }
+        },
+        {
+          "name": "GET /api/visitas/:id — Una",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/api/visitas/1", "host": ["{{baseUrl}}"], "path": ["api", "visitas", "1"] }
+          }
+        },
+        {
+          "name": "POST /api/visitas — Crear",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{baseUrl}}/api/visitas", "host": ["{{baseUrl}}"], "path": ["api", "visitas"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"cliente_id\": 1,\n  \"fecha\": \"2026-05-15\",\n  \"tipo\": \"Mantenimiento\",\n  \"tecnico\": \"Jhojan Gordillo\",\n  \"observaciones\": \"Inspección anual del tablero\"\n}"
+            }
+          }
+        },
+        {
+          "name": "PUT /api/visitas/:id — Cambiar estado",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{baseUrl}}/api/visitas/1", "host": ["{{baseUrl}}"], "path": ["api", "visitas", "1"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"estado\": \"Completada\"\n}"
+            }
+          }
+        },
+        {
+          "name": "DELETE /api/visitas/:id",
+          "request": {
+            "method": "DELETE",
+            "url": { "raw": "{{baseUrl}}/api/visitas/1", "host": ["{{baseUrl}}"], "path": ["api", "visitas", "1"] }
+          }
+        }
+      ]
+    }
+  ]
+}
