@@ -1,12 +1,20 @@
 # Bia Visitas API
 
-Microservicio MVC + CRUD para gestionar **clientes** y **visitas técnicas**.
-Retos 1 y 2 · AI Native Bia · _Jhojan Gordillo_.
+[![CI](https://github.com/jhojangordillo/bia-visitas-mvc/actions/workflows/ci.yml/badge.svg)](https://github.com/jhojangordillo/bia-visitas-mvc/actions/workflows/ci.yml)
+![Tests](https://img.shields.io/badge/tests-45%2F45%20passing-brightgreen)
+![Coverage](https://img.shields.io/badge/coverage-82.65%25-brightgreen)
+![Node](https://img.shields.io/badge/node-22.5%2B-339933)
+![License](https://img.shields.io/badge/license-ISC-blue)
+
+Microservicio MVC + CRUD para gestionar **clientes** y **visitas técnicas**, con dashboard de operaciones consumiendo la API.
+Retos 1, 2 y "Dale cara a tu API" · AI Native Bia · _Jhojan Gordillo_.
 
 > Pensado desde el dolor real de operaciones: que el técnico pueda consultar y registrar visitas a clientes (instalación, mantenimiento, inspección, emergencia) de forma centralizada, no en cuadernos ni en WhatsApp.
 
 ✅ **Reto 1:** arquitectura MVC + CRUD + diagramas
 ✅ **Reto 2:** microservicio listo para deploy + pruebas + Postman
+✅ **"Dale cara a tu API":** dashboard frontend en `/app` consumiendo los endpoints
+✅ **Bonus:** CI con GitHub Actions, blueprint para deploy 1-click en Render
 
 ---
 
@@ -212,7 +220,20 @@ El volumen `/app/data` persiste el SQLite entre reinicios.
 
 Importa `postman_collection.json` en Postman → ya trae los **13 requests** organizados en 3 carpetas (Sistema · Clientes · Visitas) con bodies de ejemplo y la variable `{{baseUrl}}`.
 
-### 4. Estructura por capas (microservicio)
+### 4. Deploy 1-click en Render
+
+El repo incluye `render.yaml` (Infrastructure as Code). En [render.com](https://render.com):
+
+1. Sign in con GitHub → **New Blueprint** → conecta `bia-visitas-mvc`
+2. Render detecta el `render.yaml` y crea el servicio solo
+3. Click **Apply** → en 3-5 min queda en `https://bia-visitas-api.onrender.com`
+
+URLs públicas tras el deploy:
+- 🌐 Dashboard: `https://bia-visitas-api.onrender.com/app`
+- 📡 API: `https://bia-visitas-api.onrender.com/api/clientes`
+- ❤️ Healthcheck: `https://bia-visitas-api.onrender.com/health`
+
+### 5. Estructura por capas (microservicio)
 
 - **`src/server.js`** → entry point (solo levanta el puerto)
 - **`src/app.js`** → construye Express (testeable sin abrir puerto)
@@ -223,4 +244,4 @@ Importa `postman_collection.json` en Postman → ya trae los **13 requests** org
 
 ---
 
-_Generado desde Cowork ⚡ · Retos 1 y 2 · AI Native Bia 2026_
+_Generado desde Cowork ⚡ · Retos 1, 2 y "Dale cara a tu API" · AI Native Bia 2026_

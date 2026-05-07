@@ -1,0 +1,24 @@
+# Render Blueprint — Bia Visitas API
+# Cuando conectas este repo a Render, detecta este archivo y crea
+# el servicio automáticamente. Cero formularios.
+#
+# Doc: https://render.com/docs/blueprint-spec
+
+services:
+  - type: web
+    name: bia-visitas-api
+    runtime: node
+    region: oregon
+    plan: free
+    branch: main
+    autoDeploy: true
+    buildCommand: npm install
+    startCommand: node --experimental-sqlite src/server.js
+    healthCheckPath: /health
+    envVars:
+      - key: NODE_VERSION
+        value: 22.5.0
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 10000
