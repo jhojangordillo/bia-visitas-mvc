@@ -6,6 +6,7 @@
  */
 
 const express = require('express');
+const path = require('path');
 
 const clienteRoutes = require('./routes/clienteRoutes');
 const visitaRoutes = require('./routes/visitaRoutes');
@@ -14,7 +15,10 @@ function createApp() {
   const app = express();
   app.use(express.json());
 
-  // Manifiesto
+  // Frontend (dashboard) servido como archivos estáticos
+  app.use('/app', express.static(path.join(__dirname, '..', 'public')));
+
+  // Manifiesto JSON
   app.get('/', (req, res) => {
     res.json({
       nombre: 'Bia Visitas API',
@@ -24,6 +28,7 @@ function createApp() {
         clientes: '/api/clientes',
         visitas: '/api/visitas',
         health: '/health',
+        dashboard: '/app',
       },
     });
   });

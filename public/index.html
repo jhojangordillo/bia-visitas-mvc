@@ -1,0 +1,617 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Bia Visitas — Dashboard de Operaciones</title>
+<style>
+:root {
+  --bg: #0d0f14;
+  --bg-soft: #161922;
+  --card: #1c2030;
+  --border: #2a2f42;
+  --text: #e7eaf0;
+  --muted: #97a0ad;
+  --primary: #7c3aed;
+  --primary-soft: rgba(124,58,237,.15);
+  --accent: #22d3ee;
+  --good: #22c55e;
+  --warn: #f59e0b;
+  --bad: #ef4444;
+}
+* { box-sizing: border-box; }
+html, body {
+  margin: 0; padding: 0;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Inter, sans-serif;
+  background: var(--bg); color: var(--text);
+  min-height: 100vh;
+}
+
+/* ---------- Header ---------- */
+.header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 18px 28px; border-bottom: 1px solid var(--border); background: var(--bg-soft);
+  position: sticky; top: 0; z-index: 10;
+}
+.header h1 { font-size: 18px; margin: 0; display: flex; align-items: center; gap: 10px; }
+.header h1 .logo { font-size: 22px; }
+.health {
+  display: flex; align-items: center; gap: 8px;
+  font-size: 13px; color: var(--muted);
+  padding: 6px 12px; background: var(--card); border-radius: 999px; border: 1px solid var(--border);
+}
+.health .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--muted); transition: background .3s; }
+.health.is-ok .dot { background: var(--good); box-shadow: 0 0 8px var(--good); }
+.health.is-bad .dot { background: var(--bad); box-shadow: 0 0 8px var(--bad); }
+
+/* ---------- Tabs ---------- */
+.tabs {
+  display: flex; gap: 4px; padding: 0 28px; border-bottom: 1px solid var(--border); background: var(--bg-soft);
+  overflow-x: auto;
+}
+.tab {
+  padding: 14px 18px; cursor: pointer; border: 0; background: transparent;
+  color: var(--muted); font: inherit; font-weight: 500; border-bottom: 2px solid transparent;
+  transition: color .15s, border-color .15s; white-space: nowrap;
+}
+.tab:hover { color: var(--text); }
+.tab.is-active { color: var(--text); border-bottom-color: var(--primary); }
+
+/* ---------- Layout ---------- */
+.container { padding: 24px 28px; max-width: 1240px; margin: 0 auto; }
+
+.toolbar {
+  display: flex; gap: 12px; align-items: center; justify-content: space-between;
+  margin-bottom: 18px; flex-wrap: wrap;
+}
+.toolbar .search {
+  flex: 1; min-width: 220px; max-width: 360px;
+  display: flex; align-items: center; gap: 8px;
+  background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 8px 12px;
+}
+.toolbar .search input {
+  background: transparent; border: 0; color: var(--text); font: inherit; flex: 1; outline: none;
+}
+.toolbar .filter select {
+  background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 9px 12px;
+  color: var(--text); font: inherit;
+}
+.btn {
+  padding: 9px 16px; border: 0; border-radius: 10px; cursor: pointer;
+  font: inherit; font-weight: 500; transition: filter .15s, transform .05s;
+}
+.btn:hover { filter: brightness(1.1); }
+.btn:active { transform: translateY(1px); }
+.btn-primary { background: var(--primary); color: white; }
+.btn-ghost { background: var(--card); color: var(--text); border: 1px solid var(--border); }
+.btn-danger { background: var(--bad); color: white; }
+.btn-sm { padding: 6px 10px; font-size: 13px; border-radius: 8px; }
+
+/* ---------- Tables ---------- */
+.card {
+  background: var(--card); border: 1px solid var(--border); border-radius: 14px;
+  overflow: hidden;
+}
+table { width: 100%; border-collapse: collapse; font-size: 14px; }
+th, td { padding: 12px 14px; text-align: left; border-bottom: 1px solid var(--border); }
+th { color: var(--muted); font-weight: 500; font-size: 12px; text-transform: uppercase; letter-spacing: .04em;
+     background: var(--bg-soft); position: sticky; top: 0; }
+tr:last-child td { border-bottom: 0; }
+tr:hover td { background: var(--bg-soft); }
+.cell-actions { white-space: nowrap; }
+.cell-id { color: var(--muted); font-variant-numeric: tabular-nums; }
+
+/* Chips */
+.chip {
+  display: inline-block; padding: 3px 10px; border-radius: 999px; font-size: 12px; font-weight: 500;
+  background: var(--primary-soft); color: var(--primary);
+}
+.chip-sector-Residencial { background: rgba(34,211,238,.12); color: var(--accent); }
+.chip-sector-Comercial   { background: rgba(124,58,237,.15); color: var(--primary); }
+.chip-sector-Industrial  { background: rgba(245,158,11,.15); color: var(--warn); }
+.chip-sector-Oficial     { background: rgba(34,197,94,.15); color: var(--good); }
+.chip-estado-Programada { background: rgba(34,211,238,.12); color: var(--accent); }
+.chip-estado-EnCurso    { background: rgba(245,158,11,.15); color: var(--warn); }
+.chip-estado-Completada { background: rgba(34,197,94,.15); color: var(--good); }
+.chip-estado-Cancelada  { background: rgba(239,68,68,.12); color: var(--bad); }
+
+/* ---------- Empty / loading ---------- */
+.skeleton-row td { padding: 14px; }
+.skeleton-bar {
+  display: block; height: 12px; background: linear-gradient(90deg, var(--bg-soft) 0%, var(--border) 50%, var(--bg-soft) 100%);
+  background-size: 200% 100%; animation: shimmer 1.4s infinite linear; border-radius: 4px;
+}
+@keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+.empty-state { padding: 40px; text-align: center; color: var(--muted); }
+.empty-state .ico { font-size: 32px; display: block; margin-bottom: 10px; }
+.error-state { padding: 40px; text-align: center; color: var(--bad); }
+
+/* ---------- Modal ---------- */
+.modal-bg {
+  position: fixed; inset: 0; background: rgba(0,0,0,.6);
+  display: none; align-items: center; justify-content: center; z-index: 100; padding: 20px;
+}
+.modal-bg.is-open { display: flex; }
+.modal {
+  background: var(--card); border: 1px solid var(--border); border-radius: 14px;
+  width: 100%; max-width: 480px; max-height: 90vh; overflow-y: auto; padding: 24px;
+}
+.modal h2 { margin: 0 0 16px; font-size: 18px; }
+.modal label { display: block; margin-top: 12px; font-size: 13px; color: var(--muted); }
+.modal input, .modal select, .modal textarea {
+  width: 100%; padding: 10px 12px; margin-top: 4px;
+  background: var(--bg-soft); border: 1px solid var(--border); border-radius: 8px;
+  color: var(--text); font: inherit; outline: none; transition: border-color .15s;
+}
+.modal input:focus, .modal select:focus, .modal textarea:focus { border-color: var(--primary); }
+.modal .actions { display: flex; gap: 8px; justify-content: flex-end; margin-top: 20px; }
+.modal .err { color: var(--bad); font-size: 13px; margin-top: 8px; min-height: 18px; }
+
+/* ---------- Toast ---------- */
+.toasts { position: fixed; bottom: 24px; right: 24px; display: flex; flex-direction: column; gap: 8px; z-index: 200; }
+.toast {
+  background: var(--card); border: 1px solid var(--border); padding: 12px 16px; border-radius: 10px;
+  min-width: 240px; max-width: 360px; box-shadow: 0 10px 30px rgba(0,0,0,.4);
+  animation: slidein .25s ease-out;
+}
+.toast.is-ok  { border-left: 4px solid var(--good); }
+.toast.is-bad { border-left: 4px solid var(--bad);  }
+@keyframes slidein { from { transform: translateX(20px); opacity: 0; } to { transform: none; opacity: 1; } }
+
+/* Mobile */
+@media (max-width: 640px) {
+  .header, .tabs, .container { padding-left: 16px; padding-right: 16px; }
+  .header h1 span:not(.logo) { display: none; }
+  th.hide-sm, td.hide-sm { display: none; }
+  table { font-size: 13px; }
+  th, td { padding: 10px 8px; }
+}
+</style>
+</head>
+<body>
+
+<header class="header">
+  <h1><span class="logo">⚡</span> <span>Bia Visitas — Dashboard</span></h1>
+  <div id="health" class="health"><span class="dot"></span><span class="label">Conectando...</span></div>
+</header>
+
+<nav class="tabs">
+  <button class="tab is-active" data-tab="clientes">👥 Clientes</button>
+  <button class="tab" data-tab="visitas">📅 Visitas</button>
+</nav>
+
+<main class="container">
+
+  <!-- ============ Tab Clientes ============ -->
+  <section id="tab-clientes" class="tab-panel">
+    <div class="toolbar">
+      <div class="search">
+        🔍 <input id="qCli" placeholder="Buscar por nombre, documento o ciudad..." />
+      </div>
+      <button class="btn btn-primary" id="btnNuevoCli">+ Nuevo cliente</button>
+    </div>
+
+    <div class="card">
+      <table>
+        <thead>
+          <tr>
+            <th class="hide-sm">#</th>
+            <th>Nombre</th>
+            <th>Documento</th>
+            <th>Sector</th>
+            <th class="hide-sm">Ciudad</th>
+            <th class="hide-sm">Teléfono</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody id="tblCli"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ============ Tab Visitas ============ -->
+  <section id="tab-visitas" class="tab-panel" hidden>
+    <div class="toolbar">
+      <div class="search">
+        🔍 <input id="qVis" placeholder="Buscar por técnico, tipo, observaciones..." />
+      </div>
+      <div class="filter">
+        <select id="filtroEstado">
+          <option value="">Todos los estados</option>
+          <option>Programada</option>
+          <option>En curso</option>
+          <option>Completada</option>
+          <option>Cancelada</option>
+        </select>
+      </div>
+      <button class="btn btn-primary" id="btnNuevaVis">+ Nueva visita</button>
+    </div>
+
+    <div class="card">
+      <table>
+        <thead>
+          <tr>
+            <th>Fecha</th>
+            <th>Cliente</th>
+            <th>Tipo</th>
+            <th>Estado</th>
+            <th class="hide-sm">Técnico</th>
+            <th class="hide-sm">Notas</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody id="tblVis"></tbody>
+      </table>
+    </div>
+  </section>
+
+</main>
+
+<!-- ============ Modal Cliente ============ -->
+<div class="modal-bg" id="modalCli">
+  <div class="modal">
+    <h2 id="tituloCli">Nuevo cliente</h2>
+    <form id="formCli">
+      <input type="hidden" id="cliId" />
+      <label>Nombre <input id="cliNombre" required /></label>
+      <label>Documento <input id="cliDoc" required /></label>
+      <label>Sector
+        <select id="cliSector" required>
+          <option>Residencial</option>
+          <option>Comercial</option>
+          <option>Industrial</option>
+          <option>Oficial</option>
+        </select>
+      </label>
+      <label>Ciudad <input id="cliCiudad" required /></label>
+      <label>Dirección <input id="cliDireccion" /></label>
+      <label>Teléfono <input id="cliTelefono" /></label>
+      <div class="err" id="errCli"></div>
+      <div class="actions">
+        <button type="button" class="btn btn-ghost" data-close>Cancelar</button>
+        <button class="btn btn-primary">Guardar</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- ============ Modal Visita ============ -->
+<div class="modal-bg" id="modalVis">
+  <div class="modal">
+    <h2 id="tituloVis">Nueva visita</h2>
+    <form id="formVis">
+      <input type="hidden" id="visId" />
+      <label>Cliente
+        <select id="visCliente" required></select>
+      </label>
+      <label>Fecha <input type="date" id="visFecha" required /></label>
+      <label>Tipo
+        <select id="visTipo" required>
+          <option>Instalación</option>
+          <option>Mantenimiento</option>
+          <option>Inspección</option>
+          <option>Emergencia</option>
+          <option>Retiro</option>
+        </select>
+      </label>
+      <label>Estado
+        <select id="visEstado">
+          <option>Programada</option>
+          <option>En curso</option>
+          <option>Completada</option>
+          <option>Cancelada</option>
+        </select>
+      </label>
+      <label>Técnico <input id="visTecnico" required /></label>
+      <label>Observaciones <textarea id="visObs" rows="3"></textarea></label>
+      <div class="err" id="errVis"></div>
+      <div class="actions">
+        <button type="button" class="btn btn-ghost" data-close>Cancelar</button>
+        <button class="btn btn-primary">Guardar</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div class="toasts" id="toasts"></div>
+
+<script>
+// ============ Config ============
+const API = ''; // mismo origen → fetch a /api/...
+
+// ============ Helpers ============
+const $ = (sel) => document.querySelector(sel);
+const $$ = (sel) => Array.from(document.querySelectorAll(sel));
+const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) =>
+  ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+
+function toast(message, type = 'ok') {
+  const el = document.createElement('div');
+  el.className = 'toast is-' + type;
+  el.textContent = message;
+  $('#toasts').appendChild(el);
+  setTimeout(() => el.remove(), 3500);
+}
+
+async function api(path, opts = {}) {
+  const res = await fetch(API + path, {
+    headers: { 'Content-Type': 'application/json' },
+    ...opts,
+  });
+  const json = await res.json().catch(() => ({}));
+  if (!res.ok) {
+    const err = json.error || (json.errores && json.errores.join(', ')) || res.statusText;
+    throw new Error(err);
+  }
+  return json;
+}
+
+function skeleton(rows, cols) {
+  let html = '';
+  for (let i = 0; i < rows; i++) {
+    html += '<tr class="skeleton-row">';
+    for (let j = 0; j < cols; j++) html += '<td><span class="skeleton-bar"></span></td>';
+    html += '</tr>';
+  }
+  return html;
+}
+
+// ============ State ============
+let clientes = [];
+let visitas = [];
+
+// ============ Health ============
+async function checkHealth() {
+  try {
+    const r = await api('/health');
+    $('#health').classList.add('is-ok');
+    $('#health').classList.remove('is-bad');
+    $('#health .label').textContent = `API conectada · uptime ${Math.round(r.uptime)}s`;
+  } catch (e) {
+    $('#health').classList.add('is-bad');
+    $('#health .label').textContent = 'API desconectada';
+  }
+}
+
+// ============ Tabs ============
+$$('.tab').forEach((t) => {
+  t.addEventListener('click', () => {
+    $$('.tab').forEach((x) => x.classList.toggle('is-active', x === t));
+    $$('.tab-panel').forEach((p) => (p.hidden = p.id !== 'tab-' + t.dataset.tab));
+  });
+});
+
+// ============ Clientes ============
+function rowCli(c) {
+  return `
+    <tr>
+      <td class="hide-sm cell-id">#${c.id}</td>
+      <td><strong>${esc(c.nombre)}</strong></td>
+      <td>${esc(c.documento)}</td>
+      <td><span class="chip chip-sector-${esc(c.sector)}">${esc(c.sector)}</span></td>
+      <td class="hide-sm">${esc(c.ciudad)}</td>
+      <td class="hide-sm">${esc(c.telefono || '—')}</td>
+      <td class="cell-actions">
+        <button class="btn btn-ghost btn-sm" onclick="editarCliente(${c.id})">Editar</button>
+        <button class="btn btn-danger btn-sm" onclick="borrarCliente(${c.id})">×</button>
+      </td>
+    </tr>`;
+}
+
+function renderCli() {
+  const q = $('#qCli').value.trim().toLowerCase();
+  const filtradas = clientes.filter((c) =>
+    !q || `${c.nombre} ${c.documento} ${c.ciudad}`.toLowerCase().includes(q)
+  );
+  if (!filtradas.length) {
+    $('#tblCli').innerHTML = `<tr><td colspan="7"><div class="empty-state">
+      <span class="ico">👥</span>${q ? 'Sin coincidencias para "' + esc(q) + '"' : 'Aún no hay clientes — crea el primero ✨'}
+    </div></td></tr>`;
+    return;
+  }
+  $('#tblCli').innerHTML = filtradas.map(rowCli).join('');
+}
+
+async function cargarClientes() {
+  $('#tblCli').innerHTML = skeleton(3, 7);
+  try {
+    const r = await api('/api/clientes');
+    clientes = r.data;
+    renderCli();
+  } catch (e) {
+    $('#tblCli').innerHTML = `<tr><td colspan="7"><div class="error-state">⚠️ ${esc(e.message)}</div></td></tr>`;
+    toast('No se pudo cargar clientes: ' + e.message, 'bad');
+  }
+}
+
+window.editarCliente = (id) => {
+  const c = clientes.find((x) => x.id === id);
+  if (!c) return;
+  $('#tituloCli').textContent = 'Editar cliente';
+  $('#cliId').value = c.id;
+  $('#cliNombre').value = c.nombre;
+  $('#cliDoc').value = c.documento;
+  $('#cliSector').value = c.sector;
+  $('#cliCiudad').value = c.ciudad;
+  $('#cliDireccion').value = c.direccion || '';
+  $('#cliTelefono').value = c.telefono || '';
+  $('#errCli').textContent = '';
+  $('#modalCli').classList.add('is-open');
+};
+
+window.borrarCliente = async (id) => {
+  if (!confirm('¿Borrar cliente y sus visitas (CASCADE)?')) return;
+  try {
+    await api('/api/clientes/' + id, { method: 'DELETE' });
+    toast('Cliente eliminado');
+    cargarClientes();
+    cargarVisitas();
+  } catch (e) { toast('Error: ' + e.message, 'bad'); }
+};
+
+$('#btnNuevoCli').onclick = () => {
+  $('#tituloCli').textContent = 'Nuevo cliente';
+  $('#formCli').reset();
+  $('#cliId').value = '';
+  $('#errCli').textContent = '';
+  $('#modalCli').classList.add('is-open');
+};
+
+$('#formCli').onsubmit = async (e) => {
+  e.preventDefault();
+  const id = $('#cliId').value;
+  const body = {
+    nombre: $('#cliNombre').value.trim(),
+    documento: $('#cliDoc').value.trim(),
+    sector: $('#cliSector').value,
+    ciudad: $('#cliCiudad').value.trim(),
+    direccion: $('#cliDireccion').value.trim() || undefined,
+    telefono: $('#cliTelefono').value.trim() || undefined,
+  };
+  try {
+    if (id) {
+      await api('/api/clientes/' + id, { method: 'PUT', body: JSON.stringify(body) });
+      toast('Cliente actualizado');
+    } else {
+      await api('/api/clientes', { method: 'POST', body: JSON.stringify(body) });
+      toast('Cliente creado');
+    }
+    $('#modalCli').classList.remove('is-open');
+    cargarClientes();
+    poblarSelectClientes();
+  } catch (e) { $('#errCli').textContent = e.message; }
+};
+
+$('#qCli').oninput = renderCli;
+
+// ============ Visitas ============
+function rowVis(v) {
+  const estadoCls = v.estado.replace(' ', '');
+  return `
+    <tr>
+      <td>${esc(v.fecha)}</td>
+      <td><strong>${esc(v.cliente_nombre)}</strong></td>
+      <td>${esc(v.tipo)}</td>
+      <td><span class="chip chip-estado-${esc(estadoCls)}">${esc(v.estado)}</span></td>
+      <td class="hide-sm">${esc(v.tecnico)}</td>
+      <td class="hide-sm" style="max-width:240px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${esc(v.observaciones || '—')}</td>
+      <td class="cell-actions">
+        <button class="btn btn-ghost btn-sm" onclick="editarVisita(${v.id})">Editar</button>
+        <button class="btn btn-danger btn-sm" onclick="borrarVisita(${v.id})">×</button>
+      </td>
+    </tr>`;
+}
+
+function renderVis() {
+  const q = $('#qVis').value.trim().toLowerCase();
+  const estado = $('#filtroEstado').value;
+  const filtradas = visitas.filter((v) => {
+    if (estado && v.estado !== estado) return false;
+    if (q && !`${v.tecnico} ${v.tipo} ${v.observaciones || ''} ${v.cliente_nombre}`.toLowerCase().includes(q)) return false;
+    return true;
+  });
+  if (!filtradas.length) {
+    $('#tblVis').innerHTML = `<tr><td colspan="7"><div class="empty-state">
+      <span class="ico">📅</span>Sin visitas para mostrar
+    </div></td></tr>`;
+    return;
+  }
+  $('#tblVis').innerHTML = filtradas.map(rowVis).join('');
+}
+
+async function cargarVisitas() {
+  $('#tblVis').innerHTML = skeleton(3, 7);
+  try {
+    const r = await api('/api/visitas');
+    visitas = r.data;
+    renderVis();
+  } catch (e) {
+    $('#tblVis').innerHTML = `<tr><td colspan="7"><div class="error-state">⚠️ ${esc(e.message)}</div></td></tr>`;
+    toast('No se pudo cargar visitas: ' + e.message, 'bad');
+  }
+}
+
+function poblarSelectClientes() {
+  $('#visCliente').innerHTML = clientes
+    .map((c) => `<option value="${c.id}">${esc(c.nombre)} · ${esc(c.documento)}</option>`)
+    .join('');
+}
+
+window.editarVisita = (id) => {
+  const v = visitas.find((x) => x.id === id);
+  if (!v) return;
+  $('#tituloVis').textContent = 'Editar visita';
+  $('#visId').value = v.id;
+  $('#visCliente').value = v.cliente_id;
+  $('#visFecha').value = v.fecha;
+  $('#visTipo').value = v.tipo;
+  $('#visEstado').value = v.estado;
+  $('#visTecnico').value = v.tecnico;
+  $('#visObs').value = v.observaciones || '';
+  $('#errVis').textContent = '';
+  $('#modalVis').classList.add('is-open');
+};
+
+window.borrarVisita = async (id) => {
+  if (!confirm('¿Borrar la visita?')) return;
+  try {
+    await api('/api/visitas/' + id, { method: 'DELETE' });
+    toast('Visita eliminada');
+    cargarVisitas();
+  } catch (e) { toast('Error: ' + e.message, 'bad'); }
+};
+
+$('#btnNuevaVis').onclick = () => {
+  if (!clientes.length) { toast('Crea un cliente primero', 'bad'); return; }
+  $('#tituloVis').textContent = 'Nueva visita';
+  $('#formVis').reset();
+  $('#visId').value = '';
+  $('#visEstado').value = 'Programada';
+  $('#errVis').textContent = '';
+  $('#modalVis').classList.add('is-open');
+};
+
+$('#formVis').onsubmit = async (e) => {
+  e.preventDefault();
+  const id = $('#visId').value;
+  const body = {
+    cliente_id: Number($('#visCliente').value),
+    fecha: $('#visFecha').value,
+    tipo: $('#visTipo').value,
+    estado: $('#visEstado').value,
+    tecnico: $('#visTecnico').value.trim(),
+    observaciones: $('#visObs').value.trim() || undefined,
+  };
+  try {
+    if (id) {
+      await api('/api/visitas/' + id, { method: 'PUT', body: JSON.stringify(body) });
+      toast('Visita actualizada');
+    } else {
+      await api('/api/visitas', { method: 'POST', body: JSON.stringify(body) });
+      toast('Visita creada');
+    }
+    $('#modalVis').classList.remove('is-open');
+    cargarVisitas();
+  } catch (e) { $('#errVis').textContent = e.message; }
+};
+
+$('#qVis').oninput = renderVis;
+$('#filtroEstado').onchange = renderVis;
+
+// ============ Modal close ============
+$$('[data-close], .modal-bg').forEach((el) => {
+  el.addEventListener('click', (e) => {
+    if (e.target === el || e.target.hasAttribute('data-close')) {
+      el.closest('.modal-bg').classList.remove('is-open');
+    }
+  });
+});
+
+// ============ Bootstrap ============
+checkHealth();
+setInterval(checkHealth, 30000);
+cargarClientes().then(poblarSelectClientes);
+cargarVisitas();
+</script>
+</body>
+</html>
